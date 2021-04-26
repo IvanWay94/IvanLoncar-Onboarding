@@ -8,7 +8,7 @@
 
 struct MyBigInt {
 
-	MyBigInt() {};
+	constexpr MyBigInt() {};
 	MyBigInt(int n) {
 		int len = 0;
 		int var = n;
@@ -28,16 +28,6 @@ struct MyBigInt {
 			var /= 10;
 			len++;
 		}
-		/*len = len / 2;
-		var = 0;
-		while (len > 0)
-		{
-			digit = digits[var];
-			digits[var] = digits[size - 1 - var];
-			digits[size - 1 - var] = digit;
-			var++;
-			len--;
-		}*/
 	}
 	~MyBigInt() { delete (digits); }
 
@@ -63,22 +53,43 @@ struct MyBigInt {
 		memcpy(digits, other.digits, size);
 	}
 	
-
-	MyBigInt(MyBigInt&& other) {
-		//std::cout << "Move Constructor" << std::endl;
-		size = other.size;
-		digits = other.digits;
+	MyBigInt(MyBigInt&& other)
+	{
+		this->digits = other.digits;
 		other.digits = nullptr;
+		this->size = other.size;
+		other.size = 0;
 	}
-	//MyBigInt(int n, const char* t) { size = n; digits = (int_least8_t*)t; }
+
+	MyBigInt& operator=(const char* other) {
+		size = strlen(other);
+		delete[] digits;
+		digits = new int_least8_t[size+1];
+		for(int i=0; i<size; i++)
+        {
+			digits[size-i-1] = other[i] - 48;
+		}
+		return *this;
+	}
+	friend bool operator!=(const MyBigInt& lhs, const MyBigInt& rhs);
 	friend MyBigInt operator+(const MyBigInt& lhs, const MyBigInt& rhs);
-	//friend MyBigInt operator!=(const MyBigInt& lhs, const MyBigInt& rhs);
-	//friend MyBigInt operator"" _mbi(char t);
+	friend MyBigInt operator"" _mbi(const char *t);
 	friend std::ostream& operator<<(std::ostream& os, const MyBigInt& Value);
 private:
 	int_least8_t* digits = nullptr;
 	int size = 0;
 };
+
+bool operator!=(const MyBigInt& lhs, const MyBigInt& rhs)
+{
+	if (lhs.size != rhs.size)
+	{
+		return true;
+	}
+
+	int res = std::memcmp(lhs.digits, rhs.digits, lhs.size); // or rhs.size since both are same
+	return res != 0;
+}
 
 std::ostream& operator<<(std::ostream& os, const MyBigInt& Value)
 {
@@ -97,15 +108,12 @@ std::ostream& operator<<(std::ostream& os, const MyBigInt& Value)
   	return os;
 }
 
-/*bool operator!=(const MyBigInt& lhs, const MyBigInt& rhs){
-	//To be implemented
-	return true;
-}*/
-
-/*MyBigInt operator"" _mbi(const char* t)
+MyBigInt operator"" _mbi(const char* other)
 {
-	return MyBigInt(sizeof(t), t);
-}*/
+	MyBigInt ret{ 0 };
+	ret = other;
+	return ret;
+}
 
 
 #endif

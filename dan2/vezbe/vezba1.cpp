@@ -34,28 +34,40 @@ MyBigInt fibo(int n);
 int main()
 {
 	MyBigInt k{ 7 };
-	k = fibo(9);
+	k = std::move(fibo(9));
 	k = k + 5;
 	std::cout << k << std::endl;
 	k = 7 + fibo(11);
 	std::cout << k << std::endl;
-	/*k = 13_mbi;
+	k = 13_mbi;
 	std::cout << k << std::endl;
 	MyBigInt l = fibo(300);
 	if (l != 222232244629420445529739893461909967206666939096499764990979600_mbi) {
 		std::cout << "Greska!" << std::endl;
 		return 1;
 	}
-	std::cout << l << std::endl;*/
+	std::cout << l << std::endl;
 	return 0;
 }
 
 MyBigInt fibo(int n)
 {
-	if (n <= 0)
-		return -1;
-	if (n <= 2)
-		return 1;
-	else
-		return fibo(n - 1) + fibo(n - 2);
+	MyBigInt fib_1n = 0;
+	MyBigInt fib_2n = 1;
+	MyBigInt fib_n = 1;
+	//for (int i = 2; i <= n; i++)
+	int i = 0;
+	do{
+
+		fib_2n = fib_1n;
+		fib_1n = fib_n;
+		fib_n = fib_2n + fib_1n;
+		/*fib_2n = std::move(fib_1n);
+		fib_1n = std::move(fib_n);
+		fib_n = std::move(fib_2n + fib_1n);*/
+
+		i++;
+	} while (i < n - 1);
+
+	return fib_n;
 }
